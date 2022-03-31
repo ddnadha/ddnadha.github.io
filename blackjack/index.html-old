@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>BlackJack</title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+	<style type="text/css">
+		img{
+			max-height: 300px;
+		}
+		.sub_div {
+            position: absolute;
+            bottom: 0px;
+        }
+		.modal-dialog,
+			.modal.right .modal-dialog {
+				position: fixed;
+				margin: auto;
+				width: 370px;
+				height: 100vh;
+				-webkit-transform: translate3d(0%, 0, 0);
+				    -ms-transform: translate3d(0%, 0, 0);
+				     -o-transform: translate3d(0%, 0, 0);
+				        transform: translate3d(0%, 0, 0);
+			}
+
+			.modal.left .modal-content,
+			.modal.right .modal-content {
+				height: 100%;
+				overflow-y: auto;
+				position:relative;
+			}
+			
+			.modal.left .modal-body,
+			.modal.right .modal-body {
+				padding: 15px 15px 80px;
+			}
+
+		/*Left*/
+			.modal.left.fade .modal-dialog{
+				left: -320px;
+				-webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+				   -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+				     -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+				        transition: opacity 0.3s linear, left 0.3s ease-out;
+			}
+			
+			.modal.left.fade.in .modal-dialog{
+				left: 0;
+			}
+		        
+		/*Right*/
+			.modal.right.fade .modal-dialog {
+				right: -320px;
+				-webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+				   -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+				     -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+				        transition: opacity 0.3s linear, right 0.3s ease-out;
+			}
+			
+			.modal.right.fade.in .modal-dialog {
+				right: 0;
+			}
+
+		/* ----- MODAL STYLE ----- */
+			.modal-content {
+				border-radius: 0;
+				border: none;
+			}
+
+			.modal-header {
+				position: fixed;
+				top: 0px;
+				width: 100%;
+				z-index: 10;
+				/*border-bottom-color: #EEEEEE;*/
+				background-color: white;
+			}
+
+			.modal-footer{
+				background-color: white;
+				border-radius: 0;
+				bottom:0px;
+				position:fixed;
+				width:100%;
+			}
+	</style>
+</head>
+<body>
+	<div class="welcome">
+		<form>
+			<input type="text" name="kode">
+			<input type="text" name="name">
+			<button type="submit" id="btn_play">Main</button>
+		</form>
+	</div>
+	<div id="playing-zone" style="display: none;">
+		<div id="opponent_hand_area">
+			<img src="" id="oppCard1">
+			<img src="" id="oppCard2">
+		</div>
+		<div id="player_hand_area">
+			
+		</div>
+		<p id="value"></p>
+		<button id="btn_add_card">Tambah</button>
+		<button id="btn_lock">Pass</button>
+		<button id="btn_open">Buka</button>
+		<button onClick="window.location.href=window.location.href">Restart</button>
+	</div>
+	<button type="button" class="btn btn-demo" data-bs-toggle="modal" data-bs-target="#myModal2">
+		Right Sidebar Modal
+	</button>
+	<!-- modal -->
+	<div class="modal right fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content" style="padding-top: 60px;">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="myModalLabel2">Chat</h4>
+				</div>
+				<div class="modal-body" >
+					<div class="position-relative">
+						<div class="chat-messages p-4" id="chat-messages">
+							<div class="px-4 py-4">
+								<b>You</b><br>
+								Lorem ipsum dolor sit amet, vis erat denique in, dicunt prodesset te vix.
+							</div>
+							<div class="px-4 py-4">
+								<b>You</b><br>
+								Lorem ipsum dolor sit amet, vis erat denique in, dicunt prodesset te vix.
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<div class="form-group">
+						<input type="text" name="msg" id="input_msg" class="form-control">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-analytics-compat.js"></script>
+<script src="./assets/script/firebase.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		// var messages = document.getElementsByClassName('modal-body')[0]
+		// console.log([messages.scrollHeight, messages.scrollTop])
+		// messages.scrollTop = messages.scrollHeight
+		//default variable
+		let arrNumCard = ["a", "2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k" ];
+		let arrValueCard = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
+		let arrElCard = ["c", "d", "h", 's'];
+		let arrAvaiableCard = [];
+		let playerCardValue = 0;
+		let opponentCardValue = 0;
+		let opponentCardCount = 2;
+		let playerCardCount = 2;
+		let opponentCard = [];
+		let playerCard = [];
+		let roomId = ''
+		let playerName = '';
+
+		//initiate array kartu
+		arrElCard.forEach(function(item, index){
+			arrNumCard.forEach(function(itemNum, indexNum){
+				arrAvaiableCard.push(item+""+itemNum);
+			});
+		});
+
+		if (getUrlParameter('kode') && getUrlParameter('name')) {
+			roomId = getUrlParameter('kode')
+			playerName = getUrlParameter('name')
+			$('#playing-zone').css('display', '');
+			//for listening player action
+
+			firebase.database().ref(`${roomId}/${playerName}/`).on('value', (snapshot) => {
+			  if (snapshot.val() == null){
+			  	firebase.database().ref(`${roomId}/`).get().then((snapshot) => {
+			  		if (snapshot.val() == null || Object.keys(snapshot.val()) < 2) initCard();
+			  		else {
+			  			console.log(Object.keys(snapshot.val()))
+			  			alert("room penuh")
+			  			window.location.href = "file:///C:/Users/didan/Documents/Tugas%20Kuliah/Pem%20Web/blackjack/index.html"
+			  		}
+			  	})
+			  }else {
+			  	var content = '';
+			  	snapshot.val().card.forEach(function(item, index){
+			  		arrAvaiableCard.splice(arrAvaiableCard.indexOf(item), 1)
+			  		content += `<img src="./assets/img/deck/card_b_${item}_large.png" id="playerCard${index}">`
+			  	})
+			  	playerCardValue = snapshot.val().value
+			  	$('#player_hand_area').html(content)
+			  	//for listening opp action
+			  	firebase.database().ref(`${roomId}`).on('value', (snapshot) => {
+			  		var arr = snapshot.val();
+			  		var content = '';
+			  		var opCard = [];
+			  	  	Object.keys(arr).forEach(function(item, index){
+			  	  		var obj = arr[item]
+			  	  		if (item != playerName) {
+			  	  			obj.card.forEach(function(i, x){
+			  	  				opCard.push(i)
+			  	  				arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
+			  	  				content += `<img src="./assets/img/deck/default.png" id="oppCard${x}">`
+			  	  			})
+			  	  		}
+			  	  		opponentCardValue = obj.value
+			  	  	})
+			  	  	opponentCard = opCard
+			  	  	$('#opponent_hand_area').html(content)
+			  	});
+			  }
+			});
+			
+		}
+
+		$('#btn_play').click(function(){
+			roomId = $('input[name=kode]').val()
+			playerName = $('input[name=name]').val()
+			console.log([roomId, playerName])
+			$('#welcome').css('diplay','none');
+			$('#playing-zone').css('display', '')
+			initCard()
+		})
+
+		
+		//method ketika button tambah kartu ditekan
+		$('#btn_add_card').click(function(){
+			var tmpCard = randomCard(arrAvaiableCard)
+			arrAvaiableCard.splice(arrAvaiableCard.indexOf(tmpCard), 1)
+			playerCardCount++
+			playerCardValue += arrValueCard[arrNumCard.indexOf(tmpCard.substr(1))]
+			var content = `<img src="./assets/img/deck/card_b_${tmpCard}_large.png" id="playerCard${playerCardCount}">`
+			$('#player_hand_area').append(content)
+			$('#value').html(playerCardValue)
+			saveToDB(playerName, tmpCard, arrValueCard[arrNumCard.indexOf(tmpCard.substr(1))])
+		})
+
+		//method ketika button pass ditekan
+		$('#btn_lock').click(function(){
+			console.log(opponentCardValue)
+			while(opponentCardValue < 21){
+				var tmpCard = randomCard(arrAvaiableCard)
+				arrAvaiableCard.splice(arrAvaiableCard.indexOf(tmpCard), 1)
+				opponentCard.push(tmpCard)
+				opponentCardCount++
+				opponentCardValue += arrValueCard[arrNumCard.indexOf(tmpCard.substr(1))]
+				var content = `<img src="./assets/img/deck/default.png" id="oppCard${playerCardCount}">`
+				$('#opponent_hand_area').append(content)
+			}
+		})
+
+		//method ketika button buka ditekan
+		$('#btn_open').click(function(){
+			var content = ``
+			$('#opponent_hand_area').html('')
+			opponentCard.forEach(function(item, index){
+				content += `<img src="./assets/img/deck/card_b_${item}_large.png" id="playerCard${index}">`
+			})
+			$('#opponent_hand_area').html(content)
+			$('#value').html(playerCardValue+" vs "+opponentCardValue)
+			getWinner()
+		})
+
+		//untuk ambil 2 kartu pada awal game
+		function initCard(){
+			for (var i = 0; i < 2; i++) {
+				//pick player card
+				var tmpCard = randomCard(arrAvaiableCard)
+				playerCard.push(tmpCard)
+				arrAvaiableCard.splice(arrAvaiableCard.indexOf(tmpCard), 1)
+				playerCardValue += arrValueCard[arrNumCard.indexOf(tmpCard.substr(1))]
+				$('#playerCard'+(i+1)).attr('src', './assets/img/deck/card_b_'+tmpCard+'_large.png')
+
+				//pick opponent card
+				// var tmpCard = randomCard(arrAvaiableCard)
+				// opponentCard.push(tmpCard)
+				// arrAvaiableCard.splice(arrAvaiableCard.indexOf(tmpCard), 1)
+				// opponentCardValue += arrValueCard[arrNumCard.indexOf(tmpCard.substr(1))]
+				// $('#oppCard'+(i+1)).attr('src', './assets/img/deck/default.png')
+			}
+			//memasukkan nilai yang didapat ke tampilan
+			$('#value').html(playerCardValue)
+			saveToDB(playerName, playerCard, playerCardValue)
+		}
+		
+
+		//method untuk memasukkan data ke database
+		function saveToDB(name, card, cardVal) {
+			var arr = [];
+			var value = 0
+			var count = 0
+			console.log(`${roomId}/${name}/`)
+			firebase.database().ref(`${roomId}/${name}/`).once('value').then((snapshot) => {
+				if (snapshot.val() != null) {
+					arr = snapshot.val().card
+					value += snapshot.val().value
+					count += snapshot.val().count
+				}
+				console.log(snapshot.val())
+				
+				if (Array.isArray(card)) {
+					arr = card
+					value = cardVal
+				}else{
+					arr.push(card)
+					value += cardVal
+				}
+				count = arr.length
+				firebase.database().ref(`${roomId}/${name}`).set({
+					card: arr,
+					count: count,
+					value: value
+				})
+			});
+			
+			// firebase.database().ref(`${roomId}/didan`).set({
+			// 	card: arr,
+			// 	count: count,
+			// 	value: value
+			// })
+		}
+		//method untuk mengambil kartu acak
+		function randomCard(avaiableCard){
+			return avaiableCard[Math.floor(Math.random() * avaiableCard.length) + 1];
+		}
+		//method untuk mencari pemenang
+		function getWinner() {
+			if (playerCardValue > 21) {
+				if (opponentCardValue > 21) {
+					if (playerCardValue < opponentCardValue) alert("anda menang!")
+					else alert("anda kalah :(")
+				}else{
+					alert("anda kalah :(")
+				}
+			}else{
+				if (opponentCardValue > 21) alert("anda menang!")
+				else{
+					if (playerCardValue < opponentCardValue) alert("anda kalah :(")
+					else alert("anda menang!")
+				}
+			}
+		}
+
+		//get form data
+		function getUrlParameter(sParam) {
+		    var sPageURL = window.location.search.substring(1),
+		        sURLVariables = sPageURL.split('&'),
+		        sParameterName,
+		        i;
+
+		    for (i = 0; i < sURLVariables.length; i++) {
+		        sParameterName = sURLVariables[i].split('=');
+
+		        if (sParameterName[0] === sParam) {
+		            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+		        }
+		    }
+		    return false;
+		};
+	})
+
+	var element = document.getElementById('didan')
+	element...
+
+	$('#didan')
+</script>
+
+</html>
