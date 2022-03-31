@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"> 
+	<style type="text/css">
+		body{
+			min-width: 100%;
+			min-height: 100vh;
+			background-color: #00D1A2;
+			font-family: 'Inter', sans-serif;
+		}
+		.container{
+			height: 10px;
+			margin-top: 40px;
+			/*background-color: red;*/
+		}
+		.title{
+			font-family: 'Inter';
+			font-style: normal;
+			font-weight: 700;
+			font-size: 50px;
+			line-height: 53px;
+		}
+		.deck-card{
+			width: 114px;
+			/*height: 236px;*/
+		}
+		.deck-card-rotated{
+			width: 114px;
+			
+			/*height: 236px;*/
+		}
+		i{
+			font-size: 20px;
+		}
+		.score-box{
+			padding: 3px;
+			background-color: white;
+			font-family: 'Inter';
+			font-style: normal;
+			font-weight: 700;
+			font-size: 27px;
+			text-align: center;
+			width: 46px;
+			height: 46px;
+			margin-bottom: 3px;
+		}
+		.time-text{
+			margin-top: 10px;
+			font-family: 'Inter';
+			font-style: normal;
+			font-weight: 700;
+			font-size: 24px;
+			line-height: 29px;
+		}
+		.btn-circle{
+			width: 50px;
+            height: 50px;
+            padding: 7px 10px;
+            border-radius: 25px;
+            font-size: 10px;
+            text-align: center;
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4">
+				<h1 class="title">BLACK<br>JACK</h1>
+			</div>
+			<div class="col-md-4">
+				<div class="row" id="player2area">
+					<div class="col-md-2">
+						<div class="score-box" id="player2score">21</div>
+					</div>
+					<div class="col-md-10" id="player2deck">
+						<img class="deck-card" src="./assets/img/deck/c7.png">
+						<img class="deck-card" src="./assets/img/deck/c7.png">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4" >
+				<div class="row" style="transform: rotate(-90deg);">
+					<table id="player1area">
+						<td style="vertical-align: top; width: 1%; white-space: nowrap;">
+							<div class="score-box" id="player1score" style="transform: rotate(90deg);">21</div>
+						</td>
+						<td id="player1deck">
+							<img class="deck-card" src="./assets/img/deck/c7.png">
+							<img class="deck-card" src="./assets/img/deck/c7.png">
+						</td>
+						
+					</table>
+				</div>
+			</div>
+			<div class="col-md-4" >
+				<br><br><br><br><br><br><br>
+				<div class="row" id="player0area">
+					<div class="col-md-2">
+						<table class="h-100">
+							<tr>
+								<td style="vertical-align: bottom;">
+									<div class="score-box" id="player0score">21</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="col-md-10" id="player0deck">
+						<img class="deck-card" src="./assets/img/deck/c7.png">
+						<img class="deck-card" src="./assets/img/deck/c7.png">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 text-center">
+				<div class="row" style="transform: rotate(-90deg);">
+					<table id="player3area">
+						<td style="width: 1%; white-space: nowrap;" id="player3deck">
+							<img class="deck-card" src="./assets/img/deck/c7.png">
+							<img class="deck-card" src="./assets/img/deck/c7.png">
+						</td>
+						<td style="vertical-align: bottom;">
+							<div class="score-box" style="transform: rotate(90deg);" id="player3score">21</div>
+						</td>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 10px">
+			<div class="col-md-4">
+				<p class="time-text">03.12 | qwe-rty-yuio</p>
+			</div>
+			<div class="col-md-4 text-center" id="btn-area">
+				<button class="btn btn-warning btn-circle mx-2" style="background: #FED000; border-color: #FED000; color: white;">
+					<i class="bi bi-plus"></i>
+				</button>
+				<button class="btn btn-primary btn-circle mx-2" style="background: #0163CE; border-color: #0163CE">
+					<i class="bi bi-play-fill"></i>
+				</button>
+				<button class="btn btn-danger btn-circle mx-2" style="background: #FB037C; border-color: #FB037C">
+					<i class="bi bi-x"></i>
+				</button>
+			</div>
+			<div class="col-md-4 clearfix">
+				<button class="btn btn-outline-light btn-circle float-end">
+					<i class="bi bi-chat-dots"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-analytics-compat.js"></script>
+<script src="./assets/script/firebase.js"></script>
+<script src="./assets/script/game.js"></script>
+</html>
