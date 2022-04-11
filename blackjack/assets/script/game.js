@@ -15,7 +15,7 @@ $(document).ready(function(){
 			arrAvaiableCard.push(item+""+itemNum)
 		})
 	})
-
+	$('.time-text').html(insertAfterEveryN(roomId))
 	listen()
 
 	
@@ -91,40 +91,51 @@ $(document).ready(function(){
 		else if(tmp21 != null) alert(scoreOrder[tmp21]+" win !")
 		else alert(scoreOrder[winner]+" win !")
 
-		firebase.database().ref(`${roomId}`).once('value').then((snapshot) => {
-			var arr = snapshot.val()
-			var opCard = []
-			var m = 1
-			//listen to card changes
-		  	Object.keys(arr.player).forEach(function(item, index){
-		  		var obj = arr.player[item]
-		  		
-
-		  		if (item != playerName) {
-		  			var content = ''
-		  			obj.card.forEach(function(i, x){
-		  				opCard.push(i)
-		  				arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
-		  				content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
-		  			})
-		  			console.log([content, m])
-		  			$(`#player${m}deck`).html(content)
-		  			$(`#player${m}score`).html(obj.value)
-		  			m++
-		  		}else{
-		  			var content = ''
-		  			obj.card.forEach(function(i, x){
-		  				opCard.push(i)
-		  				arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
-		  				content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
-
-		  			})
-		  			$(`#player0deck`).html(content)
-		  			$('#player0score').html(obj.value)
-		  		}
-		  		
-		  	})
+		firebase.database().ref(`${roomId}/player/${playerName}/`).set({
+			card : [],
+			count : 0,
+			isDone : false,
+			name : playerName,
+			value: 0,
 		})
+
+		// firebase.database().ref(`${roomId}`).once('value').then((snapshot) => {
+		// 	var arr = snapshot.val()
+		// 	var opCard = []
+		// 	var m = 1
+		// 	//listen to card changes
+		//   	Object.keys(arr.player).forEach(function(item, index){
+		//   		var obj = arr.player[item]
+		  		
+
+		//   		if (item != playerName) {
+		//   			var content = ''
+		//   			obj.card.forEach(function(i, x){
+		//   				opCard.push(i)
+		//   				arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
+		//   				content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
+		//   			})
+		//   			console.log([content, m])
+		//   			$(`#player${m}deck`).html(content)
+		//   			$(`#player${m}score`).html(obj.value)
+		//   			m++
+		//   		}else{
+		//   			if(obj.count != 0){
+		//   				var content = ''
+		//   				obj.card.forEach(function(i, x){
+		//   					opCard.push(i)
+		//   					arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
+		//   					content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
+
+		//   				})
+		//   				$(`#player0deck`).html(content)
+		//   				$('#player0score').html(obj.value)	
+		//   			}
+		  			
+		//   		}
+		  		
+		//   	})
+		// })
 	}
 
 	function getUrlParameter(sParam) {
@@ -172,10 +183,29 @@ $(document).ready(function(){
 	function randomCard(){
 		return arrAvaiableCard[Math.floor(Math.random() * arrAvaiableCard.length) + 1];
 	}
+	function insertAfterEveryN(str) {
+		result = str.substr(0, 3) + '-' + str.substr(3, 3) + '-' + str.substr(6, 4)
+	  // const result = str.split('').reduce((accumulator, current, index) => {
+	  //   if (index % 3 === 1 && index > 1) {
+	  //     return accumulator + current + '-'
+	  //   }
+	  //   return accumulator + current
+	  // }, '')
+	 	return result
+	}
+
+	function insertCard() {
+		let card = [randomCard(), randomCard()]
+		arrAvaiableCard.splice(arrAvaiableCard.indexOf(card[0]), 1)
+		arrAvaiableCard.splice(arrAvaiableCard.indexOf(card[1]), 1)
+		let tmpArrValCard = arrValueCard[arrNumCard.indexOf(card[0].substr(1))] + arrValueCard[arrNumCard.indexOf(card[1].substr(1))]
+		saveToDB(card, tmpArrValCard)
+	}
 
 	function listen() {
 		//FIREBASE LISTENER
 		var arr = null
+		var forceInsert = false
 		firebase.database().ref(`${roomId}`).on('value', (snapshot) => {
 			$(`#player1area`).css('visibility', 'visible')
 			$(`#player2area`).css('visibility', 'visible')
@@ -184,6 +214,7 @@ $(document).ready(function(){
 	  		
 			var opCard = []
 			var m = 1
+			
 			//listen to card changes
 			if (arr != null) {
 				Object.keys(arr.player).forEach(function(item, index){
@@ -199,15 +230,20 @@ $(document).ready(function(){
 						$(`#player${m}score`).html("?")
 						m++
 					}else{
-						var content = ''
-						obj.card.forEach(function(i, x){
-							opCard.push(i)
-							arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
-							content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
+						if(obj.count == 0){
+							insertCard()
+						}else{
+							var content = ''
+							obj.card.forEach(function(i, x){
+								opCard.push(i)
+								arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
+								content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
 
-						})
-						$(`#player0deck`).html(content)
-						$('#player0score').html(obj.value)
+							})
+							$(`#player0deck`).html(content)
+							$('#player0score').html(obj.value)
+						}
+						
 					}
 					
 				})
@@ -235,8 +271,7 @@ $(document).ready(function(){
 		  		}
 		  	}
 		})
-
-  		if (arr == null || arr.player[playerName] == null) {
+  		if (arr == null || arr.player[playerName] == null || forceInsert == true) {
   			let card = [randomCard(), randomCard()]
 			arrAvaiableCard.splice(arrAvaiableCard.indexOf(card[0]), 1)
 			arrAvaiableCard.splice(arrAvaiableCard.indexOf(card[1]), 1)

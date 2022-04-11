@@ -113,6 +113,35 @@
             background: #ffffff;
             color: #FB037C;
         }
+        .submit{
+            margin-top: 15px;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            color: #ffffff;
+            font-size: 30px;
+        }
+        .btn-new{
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 10px;
+            background-color: #333333;
+            border-style: none;
+            border-radius: 50px;
+            width: 300px;
+            height: 50px;
+            padding: 10px;
+            padding-top:6px;
+            font-size: 25px;
+            font-family: 'Quicksand', sans-serif;
+            color: #ffffff;
+            cursor: pointer;
+        }
+        .btn-new:hover{
+            background: #ffffff;
+            color: black;
+        }
     </style>
 
 </head>
@@ -137,9 +166,42 @@
                 </div>
                 <div class="submit">
                     <input type="submit" class="btn-play" id="play" value="Play!"/>
+                    <input type="button" class="btn-new" id="new" value="Create Room">
                 </div>
             </div>
         </form>
     </div>
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.9/firebase-analytics-compat.js"></script>
+<script src="./assets/script/firebase.js"></script>
+<script type="text/javascript">
+    $('#new').on('click', function(){
+        cekFb()
+    })
+    function cekFb(){
+        var id = makeid()
+        firebase.database().ref(id).once('value').then((snapshot) => {
+            if (snapshot.val() == null) {
+                console.log(snapshot.val())
+                $('input[name="name"]').val('player 1')
+                $('input[name="code"]').val(id)
+                $('form').submit()
+            }else{
+                cekFb()
+            }
+        })
+    }
+    function makeid() {
+        var result           = '';
+        var characters       = 'abcdefghijklmnopqrstuvwxyz';
+        var charactersLength = characters.length;
+        for ( var i = 0; i < 10; i++ ) {
+          result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+</script>
 </html>
