@@ -9,6 +9,7 @@ $(document).ready(function(){
 	let roomId = getUrlParameter('code');
 	let playerName = getUrlParameter('name');
 	let cont = `<img class="deck-card" src="./assets/img/deck/default.png">`
+	let resetBtn = false
 
 	arrElCard.forEach(function(item, index){
 		arrNumCard.forEach(function(itemNum, indexNum){
@@ -35,19 +36,25 @@ $(document).ready(function(){
 	})
 
 	$('.btn-primary').click(function(){
-		firebase.database().ref(`${roomId}/player/${playerName}/`).once('value').then((snapshot) => {
-			let data = snapshot.val()
-			let updates = {}
-			data.isDone = true
-			updates[`${roomId}/player/${playerName}/`] = data
-			firebase.database().ref().update(updates)
-		})
-		$('.btn-danger').css('visibility', 'hidden')
-		$('.btn-warning').css('visibility', 'hidden')
-		$('.btn-danger').css('visibility', 'hidden')
+		if (resetBtn == false) {
+			firebase.database().ref(`${roomId}/player/${playerName}/`).once('value').then((snapshot) => {
+				let data = snapshot.val()
+				let updates = {}
+				data.isDone = true
+				updates[`${roomId}/player/${playerName}/`] = data
+				firebase.database().ref().update(updates)
+			})
+			$('.btn-danger').css('visibility', 'hidden')
+			$('.btn-warning').css('visibility', 'hidden')
+			$('.btn-danger').css('visibility', 'hidden')
+		}else{
+			window.location.reload()
+		}
 	})
 	$('.btn-danger').click(function(){
-		
+		firebase.database().ref(`${roomId}/player/${playerName}`).set({
+		})
+		window.location.href = "index.html";
 	})
 	$('.btn-outline-light').click(function(){
 		
@@ -91,51 +98,14 @@ $(document).ready(function(){
 		else if(tmp21 != null) alert(scoreOrder[tmp21]+" win !")
 		else alert(scoreOrder[winner]+" win !")
 
-		firebase.database().ref(`${roomId}/player/${playerName}/`).set({
-			card : [],
-			count : 0,
-			isDone : false,
-			name : playerName,
+		firebase.database().ref(`${roomId}/player/${playerName}`).set({
+			count: 0,
 			value: 0,
+			name: playerName,
+			isDone: false
 		})
-
-		// firebase.database().ref(`${roomId}`).once('value').then((snapshot) => {
-		// 	var arr = snapshot.val()
-		// 	var opCard = []
-		// 	var m = 1
-		// 	//listen to card changes
-		//   	Object.keys(arr.player).forEach(function(item, index){
-		//   		var obj = arr.player[item]
-		  		
-
-		//   		if (item != playerName) {
-		//   			var content = ''
-		//   			obj.card.forEach(function(i, x){
-		//   				opCard.push(i)
-		//   				arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
-		//   				content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
-		//   			})
-		//   			console.log([content, m])
-		//   			$(`#player${m}deck`).html(content)
-		//   			$(`#player${m}score`).html(obj.value)
-		//   			m++
-		//   		}else{
-		//   			if(obj.count != 0){
-		//   				var content = ''
-		//   				obj.card.forEach(function(i, x){
-		//   					opCard.push(i)
-		//   					arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
-		//   					content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
-
-		//   				})
-		//   				$(`#player0deck`).html(content)
-		//   				$('#player0score').html(obj.value)	
-		//   			}
-		  			
-		//   		}
-		  		
-		//   	})
-		// })
+		resetBtn = true
+		$('.btn-primary').html('<i class="bi bi-arrow-counterclockwise"></i>')
 	}
 
 	function getUrlParameter(sParam) {
@@ -170,7 +140,7 @@ $(document).ready(function(){
 				value += cardVal
 			}
 			count = arr.length
-			firebase.database().ref(`${roomId}/player/${playerName}/`).set({
+			firebase.database().ref(`${roomId}/player/${playerName}`).set({
 				isDone: false,
 				name: playerName,
 				card: arr,
@@ -185,12 +155,6 @@ $(document).ready(function(){
 	}
 	function insertAfterEveryN(str) {
 		result = str.substr(0, 3) + '-' + str.substr(3, 3) + '-' + str.substr(6, 4)
-	  // const result = str.split('').reduce((accumulator, current, index) => {
-	  //   if (index % 3 === 1 && index > 1) {
-	  //     return accumulator + current + '-'
-	  //   }
-	  //   return accumulator + current
-	  // }, '')
 	 	return result
 	}
 
@@ -220,19 +184,21 @@ $(document).ready(function(){
 				Object.keys(arr.player).forEach(function(item, index){
 					var obj = arr.player[item]
 					if (item != playerName) {
-						var content = ''
-						obj.card.forEach(function(i, x){
-							opCard.push(i)
-							arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
-							content += `<img src="./assets/img/deck/default.png" class="deck-card">`
-						})
-						$(`#player${m}deck`).html(content)
-						$(`#player${m}score`).html("?")
-						m++
-					}else{
-						if(obj.count == 0){
-							insertCard()
+						if (obj.count != 0) {
+							var content = ''
+							obj.card.forEach(function(i, x){
+								opCard.push(i)
+								arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
+								content += `<img src="./assets/img/deck/default.png" class="deck-card">`
+							})
+							$(`#player${m}deck`).html(content)
+							$(`#player${m}score`).html("?")
+							
 						}else{
+							$(`#player${m}area`).css('visibility', 'hidden')
+						}
+					}else{
+						if(obj.count != 0){
 							var content = ''
 							obj.card.forEach(function(i, x){
 								opCard.push(i)
