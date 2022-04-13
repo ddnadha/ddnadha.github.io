@@ -195,7 +195,8 @@ $(document).ready(function(){
 							$(`#player${m}score`).html("?")
 							
 						}else{
-							$(`#player${m}area`).css('visibility', 'hidden')
+							$(`#player${m}deck`).html('')
+							// $(`#player${m}area`).css('visibility', 'hidden')
 						}
 					}else{
 						if(obj.count != 0){
