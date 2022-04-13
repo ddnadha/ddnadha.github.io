@@ -48,6 +48,12 @@ $(document).ready(function(){
 			$('.btn-warning').css('visibility', 'hidden')
 			$('.btn-danger').css('visibility', 'hidden')
 		}else{
+			firebase.database().ref(`${roomId}/player/${playerName}`).set({
+				count: 0,
+				value: 0,
+				name: playerName,
+				isDone: false
+			})
 			window.location.reload()
 		}
 	})
@@ -65,6 +71,7 @@ $(document).ready(function(){
 	// METHOD-METHOD
 	function findWinner(score, scoreOrder) {
 		//preparation
+		console.log([score, scoreOrder])
 		var winner = null
 		var tmp21 = null
 		var moreThanOne21 = false
@@ -103,8 +110,6 @@ $(document).ready(function(){
 			var m = 1
 		  	Object.keys(arr.player).forEach(function(item, index){
 		  		var obj = arr.player[item]
-		  		
-
 		  		if (item != playerName) {
 		  			var content = ''
 		  			obj.card.forEach(function(i, x){
@@ -133,12 +138,7 @@ $(document).ready(function(){
 		  		
 		  	})
 		})
-		firebase.database().ref(`${roomId}/player/${playerName}`).set({
-			count: 0,
-			value: 0,
-			name: playerName,
-			isDone: false
-		})
+
 		resetBtn = true
 		$('.btn-primary').html('<i class="bi bi-arrow-counterclockwise"></i>')
 	}
@@ -212,15 +212,16 @@ $(document).ready(function(){
 			arr = snapshot.val()
 	  		
 			var opCard = []
-			var m = 1
+			var m = 0
 			
 			//listen to card changes
 			if (arr != null) {
 				Object.keys(arr.player).forEach(function(item, index){
-					console.log(item)
+					console.log(arr.player[item])
 					var obj = arr.player[item]
 					if (item != playerName) {
 						if (obj.count != 0) {
+							m++
 							var content = ''
 							obj.card.forEach(function(i, x){
 								opCard.push(i)
@@ -231,8 +232,7 @@ $(document).ready(function(){
 							$(`#player${m}score`).html("?")
 							
 						}else{
-							$(`#player${m}deck`).html('')
-							// $(`#player${m}area`).css('visibility', 'hidden')
+							
 						}
 					}else{
 						if(obj.count != 0){
@@ -251,7 +251,8 @@ $(document).ready(function(){
 					
 				})
 			}
-			let f = arr == null ? 0 : Object.keys(arr.player).length - 1
+			// let f = arr == null ? 0 : Object.keys(arr.player).length - 1
+			let f = arr == null ? 0 : m
 			console.log(f)
 		  	for (var i = 3; i > f; i--) {
 		  		$(`#player${i}area`).css('visibility', 'hidden')
@@ -266,7 +267,7 @@ $(document).ready(function(){
 		  			var obj = arr.player[item]
 		  			score.push(obj.value)
 		  			scoreOrder.push(obj.name)
-		  			if (obj.isDone == false) over = false
+		  			if (obj.isDone == false && obj.count != 0) over = false
 		  		})
 		  		if (over){
 		  			console.log([score, scoreOrder])
