@@ -6,7 +6,7 @@ $(document).ready(function(){
 	let playerCardValue = 0;
 	let playerCardCount = 2;
 	let playerCard = [];
-	let roomId = getUrlParameter('code');
+	let roomId = getUrlParameter('code').split('-').join('');;
 	let playerName = getUrlParameter('name');
 	let cont = `<img class="deck-card" src="./assets/img/deck/default.png">`
 	let resetBtn = false
