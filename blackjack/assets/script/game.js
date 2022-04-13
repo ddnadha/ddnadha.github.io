@@ -135,7 +135,14 @@ $(document).ready(function(){
 		  			}
 		  			
 		  		}
-		  		
+
+	  		  	firebase.database().ref(`${roomId}/player/${item}`).set({
+	  		  		card: obj.card,
+	  				count: 0,
+	  				value: 0,
+	  				name: playerName,
+	  				isDone: false
+	  			})
 		  	})
 		})
 
@@ -265,9 +272,10 @@ $(document).ready(function(){
 		  		var scoreOrder = []
 		  		Object.keys(arr.player).forEach(function(item, index){
 		  			var obj = arr.player[item]
+		  			console.log(obj)
 		  			score.push(obj.value)
 		  			scoreOrder.push(obj.name)
-		  			if (obj.isDone == false && obj.count != 0) over = false
+		  			if (obj.isDone == false) over = false
 		  		})
 		  		if (over){
 		  			console.log([score, scoreOrder])
