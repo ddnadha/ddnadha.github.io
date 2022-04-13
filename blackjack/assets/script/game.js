@@ -136,13 +136,13 @@ $(document).ready(function(){
 		  			
 		  		}
 
-	  		  	firebase.database().ref(`${roomId}/player/${item}`).set({
-	  		  		card: obj.card,
-	  				count: 0,
-	  				value: 0,
-	  				name: playerName,
-	  				isDone: false
-	  			})
+	  		 //  	firebase.database().ref(`${roomId}/player/${item}`).set({
+	  		 //  		card: obj.card,
+	  			// 	count: 0,
+	  			// 	value: 0,
+	  			// 	name: playerName,
+	  			// 	isDone: false
+	  			// })
 		  	})
 		})
 
