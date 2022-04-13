@@ -97,7 +97,42 @@ $(document).ready(function(){
 		if (moreThanOne21) alert('tie !')
 		else if(tmp21 != null) alert(scoreOrder[tmp21]+" win !")
 		else alert(scoreOrder[winner]+" win !")
+		firebase.database().ref(`${roomId}`).once('value').then((snapshot) => {
+			var arr = snapshot.val()
+			var opCard = []
+			var m = 1
+		  	Object.keys(arr.player).forEach(function(item, index){
+		  		var obj = arr.player[item]
+		  		
 
+		  		if (item != playerName) {
+		  			var content = ''
+		  			obj.card.forEach(function(i, x){
+		  				opCard.push(i)
+		  				arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
+		  				content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
+		  			})
+		  			console.log([content, m])
+		  			$(`#player${m}deck`).html(content)
+		  			$(`#player${m}score`).html(obj.value)
+		  			m++
+		  		}else{
+		  			if(obj.count != 0){
+		  				var content = ''
+		  				obj.card.forEach(function(i, x){
+		  					opCard.push(i)
+		  					arrAvaiableCard.splice(arrAvaiableCard.indexOf(i), 1)
+		  					content += `<img src="./assets/img/deck/${i}.png" class="deck-card">`
+
+		  				})
+		  				$(`#player0deck`).html(content)
+		  				$('#player0score').html(obj.value)	
+		  			}
+		  			
+		  		}
+		  		
+		  	})
+		})
 		firebase.database().ref(`${roomId}/player/${playerName}`).set({
 			count: 0,
 			value: 0,
@@ -182,6 +217,7 @@ $(document).ready(function(){
 			//listen to card changes
 			if (arr != null) {
 				Object.keys(arr.player).forEach(function(item, index){
+					console.log(item)
 					var obj = arr.player[item]
 					if (item != playerName) {
 						if (obj.count != 0) {
